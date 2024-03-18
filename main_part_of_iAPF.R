@@ -1,19 +1,3 @@
-Init <- function(time_step, L){
-  L <- L
-  n <- time_step
-  output <- init_APF(n, w = 0, X = 0, L)
-  X_apf <- output[[1]]
-  w_apf <- output[[2]]
-  Z_apf <- output[[3]]
-  
-  output2 <- psi_APF(n, X_apf, Z_apf, w = 0, X = 0, L)
-  X <- output2[[1]]
-  w <- output2[[2]]
-  psi <- output2[[3]]
-  Z <- output2[[4]]
-  
-  return(list(X, w, psi, Z))
-}
 
 psi_APF <- function(n, X_apf, Z_apf, w, X, L, N, Time, d){
   l = 1
