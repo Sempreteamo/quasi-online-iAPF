@@ -1,7 +1,6 @@
-optimization <- function(X_apf, t, psi, d){
-  data <- cbind(X_apf[t,,]^2, X_apf[t,,])
+optimization <- function(x, psi, d){
+  data <- cbind(x^2, x)
   coef <- -lm(log(psi[t,])~., as.data.frame(data))$coefficients
-  c <- coef[1]
   a <- coef[2:(1+d)]
   b <- coef[(2+d):length(coef)]
   
