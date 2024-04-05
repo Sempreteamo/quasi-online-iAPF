@@ -1,6 +1,6 @@
 #x = w[Time,]
 
-MH_distance <- function(x, Time, X){
+MH_distance <- function(x, X){
   mx <- max(x) 
   w_ <- exp(x-mx)/sum(exp(x - mx))
   
