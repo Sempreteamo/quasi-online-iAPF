@@ -1,6 +1,8 @@
-MH_distance <- function(w, Time, X){
-  mx <- max(w[Time,]) 
-  w_ <- exp(w[Time,]-mx)/sum(exp(w[Time,] - mx))
+#x = w[Time,]
+
+MH_distance <- function(x, Time, X){
+  mx <- max(x) 
+  w_ <- exp(x-mx)/sum(exp(x - mx))
   
   #Mahalanobis distance
   for(specific in 1:Time){
