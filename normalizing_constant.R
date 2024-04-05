@@ -6,6 +6,6 @@ normalizing_constant <- function(a0, P0, dt, ct, Tt, Zt, Ht, Gt, obs){
   return(fkf.obj_Z)
 }
 
-NC_estimate <- function(Z, fkf.obj_Z){
+log_ratio <- function(Z, fkf.obj_Z){
   print(exp(Z-fkf.obj_Z))
 }
