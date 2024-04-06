@@ -1,16 +1,22 @@
-multi_resampling <- function(w_apf, t, Z_apf, l){
-  mx <- max(w_apf[t-1,])
-  w_ <- exp(w_apf[t-1,]-mx)/sum(exp(w_apf[t-1, ] - mx))
-  Z_apf[l] = Z_apf[l] + log(mean(exp(w_apf[t-1,]-mx))) + mx
-  mix <- sample(1:N[l],N[l], replace = TRUE, prob = w_)
+#w = w[t-1,] or w[t-1,]
+#Z_apf = Z_apf[l]
+#N = N[l]
+multi_resampling <- function(w, N, Z_apf){
+  mx <- max(w)
+  w_ <- exp(w - mx)/sum(exp(w - mx))
+  Z_apf = Z_apf + log(mean(exp(w - mx))) + mx
+  mix <- sample(1:N, N, replace = TRUE, prob = w_)
   return(list(mix, Z_apf))
 }
 
-residual <- function(t, w, Num, Z_apf, l){
-  mx <- max(w[t-1,])
-  w_ <- exp(w[t-1,] - mx)/sum(exp(w[t-1,] - mx))
+
+#w = w[t-1,]
+#Z_apf = Z_apf[l]
+residual_resampling <- function(w, Num, Z_apf){
+  mx <- max(w)
+  w_ <- exp(w - mx)/sum(exp(w - mx))
   
-  Z_apf[l] = Z_apf[l] + log(mean(exp(w_apf[t-1,]-mx))) + mx
+  Z_apf = Z_apf + log(mean(exp(w - mx))) + mx
   
   Ntm <- as.integer(Num*w_)
   
