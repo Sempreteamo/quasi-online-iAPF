@@ -1,4 +1,5 @@
 
+
 #Below is the iAPF algorithm
 #First we do the initialization
 ####init_APF####
@@ -25,7 +26,7 @@ init_APF <- function(n, w, X, L){  #pure filtering
       w_init[1:(n-L+1),i] <- g(obs[n-L+1,], X_init[n-L+1,i,])  
     }
   }else{
-    output <- change_mu(n, w, X, L)
+    output <- change_mu(w[n-L,], X[n-L,,])
     X_init[n-L+1,,] <- output[[1]]
     for (i in 1:(n-L)) {
       X_init[i,,] <- X_init[n-L+1,,]
@@ -42,9 +43,9 @@ init_APF <- function(n, w, X, L){  #pure filtering
   
   for(t in (n-L+2):n){
     
-    if(ESS(t, w_init, is.log=TRUE) <= kappa*N[l]){
+    if(ESS(w_init[t-1,], is.log=TRUE) <= kappa*N[l]){
       
-      output <- residual(t, w_init, Num, Z_apf, l)
+      output <- residual_resampling(w_init[t-1,], Num, Z_apf[l])
       mix <- output[[1]]
       Z_apf <- output[[2]]
       # at the initialization stage, we want filtering particles for psi
@@ -66,3 +67,4 @@ init_APF <- function(n, w, X, L){  #pure filtering
   Z_apf[1] <- Z_apf[1] + log(mean(exp(w_init[n, 1:N[l]]-mx))) + mx
   return(list(X_init = X_init, w_init = w_init, Z_apf))
 }
+  
