@@ -10,16 +10,16 @@ APF <- function(Time, d, n, w, X, psi_pa, l, Z_apf, N, L){ #purely filtering par
   # w_apf[1:(n-L+1),i] <- g_aux(obs[n-L+1,], X_apf[n-L+1,i,],n-L+1, psi_pa, n, L) 
   #}
   if(n == L){
-    X_apf[n-L+1,1:N[l],] <- mu_aux(psi_pa, l, N, n-L+1)
+    X_apf[n-L+1,,] <- mu_aux(psi_pa, l, N, n-L+1)
     for (i in 1:(n-L)) {
       X_apf[i,,] <- X_apf[n-L+1,,]
     }
     for(i in 1:N[l]){
-      w_apf[1:(n-L+1),i] <- g_aux(obs[n-L+1,], X_apf[n-L+1,i,],n-L+1, psi_pa, n, L) 
+      w_apf[1:(n-L+1),i] <- g_aux(obs[n-L+1,], X_apf[n-L+1,i,], n-L+1, psi_pa, n) 
     }
   }else{
-    output <- change_mupsi(n, w, X, psi_pa, n-L+1, N, l, L)
-    X_apf[n-L+1,1:N[l],] <- output[[1]]
+    output <- change_mupsi(X[n-L,,], w[n-L,], psi_pa, n-L+1, N, l)
+    X_apf[n-L+1,,] <- output[[1]]
     for (i in 1:(n-L)) {
       X_apf[i,,] <- X_apf[n-L+1,,]
     }
@@ -29,31 +29,31 @@ APF <- function(Time, d, n, w, X, psi_pa, l, Z_apf, N, L){ #purely filtering par
       #X_apf[1:(n-L+1),i,] <- f_aux(X[n-L, i,], psi_pa, n-L+1)
       #w_apf[1:(n-L+1), i] <- g_aux(obs[n-L+1,], X_apf[n-L+1,i,], n-L+1, psi_pa, n, L)
       
-      w_apf[1:(n-L+1), i] <- g_transition(obs[n-L+1,], X_apf[n-L+1,i,],n-L+1, psi_pa, n) + log(sum_)
+      w_apf[1:(n-L+1), i] <- g_transition(obs[n-L+1,], X_apf[n-L+1,i,],  n-L+1, psi_pa, n) + log(sum_)
     }
-    
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
   }
   
   for(t in (n-L+2):n){
     print(t)
-    if(ESS(t,w_apf, is.log = TRUE) <= kappa*N[l]){
+    if(ESS(w_apf[t-1,], is.log = TRUE) <= kappa*N[l]){
       
-     output <- multi_resampling(w_apf, t, Z_apf, l)
+     output <- multi_resampling(w_apf[t-1,], N[l], Z_apf)
+     #output <- residual_resampling(w_apf[t-1,], Num, Z_apf)
      mix <- output[[1]]
      Z_apf <- output[[2]]
-      #mix <- residual(t, w_apf)
       
       for(i in 1:N[l]){
         #filtering particles
         X_apf[t,i,] <- f_aux(X_apf[t-1, mix[i],], psi_pa, t)
-        w_apf[t,i] <- g_aux(obs[t,], X_apf[t,i,], t, psi_pa, n, L) 
+        w_apf[t,i] <- g_aux(obs[t,], X_apf[t,i,], t, psi_pa, n) 
       }
     }else{
       
       for(i in 1:N[l]){
         #filtering particles
         X_apf[t,i,] <- f_aux(X_apf[t-1,i,], psi_pa, t) 
-        w_apf[t,i] <- w_apf[t-1,i] + g_aux(obs[t,], X_apf[t,i,], t, psi_pa, n, L)
+        w_apf[t,i] <- w_apf[t-1,i] + g_aux(obs[t,], X_apf[t,i,], t, psi_pa, n)
       }
     }
     
@@ -63,3 +63,4 @@ APF <- function(Time, d, n, w, X, psi_pa, l, Z_apf, N, L){ #purely filtering par
   
   return(list(X_apf, w_apf, Z_apf))
 }
+
