@@ -1,5 +1,5 @@
 
-psi_APF <- function(n, X_apf, Z_apf, w, X, L, N, Time, d){
+psi_APF <- function(n, X_apf, Z_apf, w, X, L, N, Time, d, obs){
   l = 1
   
   while(TRUE){
@@ -24,7 +24,7 @@ psi_APF <- function(n, X_apf, Z_apf, w, X, L, N, Time, d){
     if(l <= k ){
       
       #receive filtering particles X_apf for psi
-      psi_pa <- Psi(l, n, X_apf, N, L, Time) 
+      psi_pa <- Psi(n, X_apf[t,,], N, L, Time, d, obs) 
       
       if(l > k & N[max(l-k,1)] == N[l] & is.unsorted(Z_apf[max(l-k,1):l])){  
         N[l+1] <- 2*N[l]
