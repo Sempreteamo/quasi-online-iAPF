@@ -2,7 +2,7 @@
 
 #x = w[t-1,]
 
-ESS <- function(x, t, is.log=FALSE){
+ESS <- function(x, is.log=FALSE){
   if(is.log) {
     mx <- max(x)
     s <- sum(exp(x - mx))
