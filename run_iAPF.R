@@ -4,7 +4,7 @@ run_iAPF <- function(n, w, X, L, N, Time, d){
   w_apf <- output[[2]]
   Z_apf <- output[[3]]
   
-  output2 <- psi_APF(n, X_apf, Z_apf, w, X, L, N, Time, d)
+  output2 <- psi_APF(n, X_apf, Z_apf, w, X, L, N, Time, d, obs)
   
   #smoothing particles
   X <- output2[[1]]
