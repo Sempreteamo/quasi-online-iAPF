@@ -1,0 +1,74 @@
+#1: L=L1
+
+parallel_iAPF <- function(psi_final = 0, time_step, L1, L, is.parallel1) {
+  #t = 1, . . . , L/2 to obtain X2, w2 and psi2
+  psi_final <- psi_final
+  L1 <- L1
+  L <- L
+  
+  output <- run_iAPF(time_step, w = 0, X = 0, L1, N[1])#pass
+  X <- output[[1]] 
+  w <- output[[2]]
+  psi <- output[[3]]  
+  
+  if(is.parallel1 == TRUE){
+    psi_final <- psi[complete.cases(psi), ][1:ceiling(3*L/4),]
+  }
+  
+  ####Algorithm####
+  if(is.parallel1 == TRUE){
+    if(L < Time){   
+      for(time_step in seq(2*L,Time,L)){
+        
+        #I didn't include any resampling in this step
+        #Run iAPF with the initial distribution we defined 
+        output2 <- run_iAPF(time_step, w, X, L, N[1])
+        
+        X <- output2[[1]]
+        w <- output2[[2]]
+        psi <- output2[[3]]
+        gap_matrix <- matrix(NA, nrow = L/2, ncol = 2*d)
+        
+        #take psi from kL+L/4+1 to kL+3L/4+1
+        psi_final <- rbind(psi_final, gap_matrix, psi[complete.cases(psi), ][ceiling(L/4 + 1):ceiling(3*L/4),])
+      }  
+    }
+  }else{
+    #start from L/2 to 3L/2 to obtain psi2
+    count = 0
+    for(time_step in seq(ceiling(3*L/2),Time, L)){
+      #I didn't include any resampling in this step
+      #Run iAPF with the initial distribution we defined 
+      output2 <- run_iAPF(time_step, w, X, L, N, Time, d)
+      
+      #smoothing particles
+      X <- output2[[1]]
+      w <- output2[[2]]
+      psi <- output2[[3]]
+      
+      if(time_step < Time){
+        psi_final[ceiling(3*L/4+1+count*L):ceiling(3*L/4+count*L+ L/2),] <- psi[complete.cases(psi), ][ceiling(L/4 + 1):ceiling(3*L/4),]
+      }
+      
+      if(time_step == Time){
+        psi_final <- rbind(psi_final, psi[ceiling(nrow(psi_final) + 1):Time,])
+      }
+      count = count + 1
+    }
+    
+    if(time_step != Time){
+      time_step <- Time
+      
+      output2 <- run_iAPF(time_step, w, X, L1, N, Time, d)
+      
+      #smoothing particles
+      X <- output2[[1]]
+      w <- output2[[2]]
+      psi <- output2[[3]]
+      psi_final <- rbind(psi_final, psi[complete.cases(psi), ][ceiling(L1/2 + 1):L1,])
+    }
+  }
+  
+  
+  return(psi_final)
+}
