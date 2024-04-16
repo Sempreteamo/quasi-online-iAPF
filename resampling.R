@@ -12,7 +12,7 @@ multi_resampling <- function(w, N, Z_apf){
 
 #w = w[t-1,]
 #Z_apf = Z_apf[l]
-residual_resampling <- function(w, Num, Z_apf){
+residual_resampling <- function(w, Z_apf){
   mx <- max(w)
   w_ <- exp(w - mx)/sum(exp(w - mx))
   
