@@ -2,10 +2,6 @@
 
 parallel_iAPF <- function(psi_final = 0, time_step, L1, L, is.parallel1) {
   #t = 1, . . . , L/2 to obtain X2, w2 and psi2
-  psi_final <- psi_final
-  L1 <- L1
-  L <- L
-  
   output <- run_iAPF(time_step, w = 0, X = 0, L1, N[1])#pass
   X <- output[[1]] 
   w <- output[[2]]
@@ -37,9 +33,10 @@ parallel_iAPF <- function(psi_final = 0, time_step, L1, L, is.parallel1) {
     #start from L/2 to 3L/2 to obtain psi2
     count = 0
     for(time_step in seq(ceiling(3*L/2),Time, L)){
+      print(time_step)
       #I didn't include any resampling in this step
       #Run iAPF with the initial distribution we defined 
-      output2 <- run_iAPF(time_step, w, X, L, N, Time, d)
+      output2 <- run_iAPF(time_step, w, X, L, N[1])
       
       #smoothing particles
       X <- output2[[1]]
@@ -57,9 +54,10 @@ parallel_iAPF <- function(psi_final = 0, time_step, L1, L, is.parallel1) {
     }
     
     if(time_step != Time){
+      print('time_step = Time')
       time_step <- Time
       
-      output2 <- run_iAPF(time_step, w, X, L1, N, Time, d)
+      output2 <- run_iAPF(time_step, w, X, L, N)
       
       #smoothing particles
       X <- output2[[1]]
