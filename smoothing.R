@@ -1,4 +1,4 @@
-smoothing_APF <- function(psi_pa, N, Time,){ 
+smoothing_APF <- function(psi_pa){ 
   #l >= 2
   X_apf <- array(NA, dim = c(Time, N[1], d))
   w_apf <- matrix(NA, Time, N[1])
@@ -15,9 +15,9 @@ smoothing_APF <- function(psi_pa, N, Time,){
   
   for(t in 2:Time){
     
-    if(ESS(w_apf[t-1,], t, is.log = TRUE) <= kappa*Num){
+    if(ESS(w_apf[t-1,], is.log = TRUE) <= kappa*Num){
       re = re + 1
-      output <- residual_resampling(w_apf[t-1,], Num, Z_apf[l])
+      output <- residual_resampling(w_apf[t-1,], Z_apf)
       mix <- output[[1]]
       Z_apf <- output[[2]]
       
@@ -45,3 +45,4 @@ smoothing_APF <- function(psi_pa, N, Time,){
   
   return(list(X_apf, w_apf, Z_apf, re))
 }
+
