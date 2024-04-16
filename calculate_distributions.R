@@ -17,15 +17,15 @@ g <- function(y, x){
 
 #twisted mu
 mu_aux <- function(psi_pa, l, N, t){  
-  return(rmvn(N[l], diag((psi_pa[t, (d+1):(d+d)]^(-1) + 1)^(-1), nrow = d, ncol = d)%*%
-                (diag(psi_pa[t, (d+1):(d+d)]^(-1), nrow = d, ncol = d)%*%psi_pa[t,1:d]), 
-                diag((psi_pa[t, (d+1):(d+d)]^(-1) + 1)^(-1), nrow=d, ncol = d)))
+  return(rmvn(N, (psi_pa[t, (d+1):(d+d)]^(-1) + 1)^(-1)*
+                (psi_pa[t, (d+1):(d+d)]^(-1)*psi_pa[t,1:d]), 
+              diag((psi_pa[t, (d+1):(d+d)]^(-1) + 1)^(-1), nrow=d, ncol = d)))
 }
 
 #twisted g
-g_aux <- function(y, x, t, psi_pa, n){  
+g_aux <- function(y, x, t, psi_pa, n, L){  
   if(t == (n-L+1)){
-    return(g(y, x) + psi_tilda(x, psi_pa, t, n) -(1/2)*log(2*pi)-(1/2)*log(det(diag(psi_pa[t, (d+1):(d+d)]+1, nrow=d,ncol=d))) - 
+    return(g(y, x) + psi_tilda(x, psi_pa, t, n) - (1/2)*log(2*pi)-(1/2)*log(det(diag(psi_pa[t, (d+1):(d+d)]+1, nrow=d,ncol=d))) - 
              (1/2)*t(-psi_pa[t, 1:d])%*%
              diag((psi_pa[t, (d+1):(d+d)]+1)^(-1), nrow=d,ncol=d)%*%
              (-psi_pa[t, 1:d]) - psi_t(x, psi_pa, t, n))  #initialisation of g = t=1 or t=L?
@@ -53,8 +53,8 @@ g_aux_smoo <- function(y, x, t, psi_pa, n){
 #twisted f
 f_aux <- function(x, psi_pa, t){
   return(diag(((psi_pa[t, (d+1):(d+d)])^(-1)+1)^(-1), nrow=d,ncol=d)%*%
-            (A%*%x + diag(psi_pa[t, (d+1):(d+d)]^(-1), nrow=d,ncol=d)%*%psi_pa[t,1:d]) +
-            rnorm(d, 0, ((psi_pa[t, (d+1):(d+d)])^(-1)+1)^(-1)))  #f_2:T 
+           (A%*%x + diag(psi_pa[t, (d+1):(d+d)]^(-1), nrow=d,ncol=d)%*%psi_pa[t,1:d]) +
+           rnorm(d, 0, ((psi_pa[t, (d+1):(d+d)])^(-1)+1)^(-1)))  #f_2:T 
 }
 
 #psi.tilda_t = f (xt, ψt+1); psi.tilda_n = 1
@@ -90,8 +90,11 @@ psi_t <- function(x, psi_pa, t, n){
 change_mu <- function(x, mus){
   sam <- matrix(0, Num, d)
   mx <- max(x)
+  #cat('mx=',mx)
   w_ <- exp(x - mx)/sum(exp(x - mx))
+  #cat('w_=',w_)
   s <- sample(1:Num, size = Num, replace = TRUE, prob = w_) 
+  #cat('s=',s)
   for(i in 1:Num){
     sam[i,] <- rnorm(d, 0, diag(B)) + A%*%mus[s[i],]
   }
@@ -121,7 +124,7 @@ change_mupsi <- function(mus, x, psi_pa, t, N, l){
   s <- sample(1:Num, size = Num, replace = TRUE, prob = w_tilda) 
   
   #use the adjusted normalized weights to generate particles
-  for(i in 1:N[l]){
+  for(i in 1:N){
     sam[i,] <- diag((psi_pa[t, (d+1):(d+d)]^(-1)+1)^(-1), nrow=d,ncol=d)%*%
       (diag(psi_pa[t, (d+1):(d+d)]^(-1), nrow=d,ncol=d)%*%psi_pa[t,1:d] + A%*%mus[s[i],]) + 
       rnorm(d, 0, (psi_pa[t, (d+1):(d+d)]^(-1)+1)^(-1))
@@ -129,7 +132,7 @@ change_mupsi <- function(mus, x, psi_pa, t, N, l){
   
   #calculate the normalizing constant
   sum_ <- 0
-  for(i in 1:N[l]){
+  for(i in 1:N){
     sum_ = sum_ + exp(w_[i])*
       exp((-1/2)*t(A%*%mus[i,] - psi_pa[t,1:d])%*%diag((psi_pa[t, (d+1):(d+d)]+1)^(-1), nrow=d,ncol=d)%*%
             (A%*%mus[i,] - psi_pa[t,1:d]))
