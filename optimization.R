@@ -1,7 +1,7 @@
 #x = X_apf[t,,]
 #psi = psi[t,]
 
-optimization <- function(x, psi, d){
+optimization <- function(x, psi){
   psi_pa1 <- vector()
   
   coef <- -lm(log(psi)~., data.frame(x^2, x))$coefficients
