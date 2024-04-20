@@ -52,10 +52,9 @@ g_aux_smoo <- function(y, x, t, psi_pa, n){
 
 #twisted f
 f_aux <- function(x, psi_pa, t){
-  return(diag(((psi_pa[t, (d+1):(d+d)])^(-1)+1)^(-1), nrow=d,ncol=d)%*%
-           (A%*%x + diag(psi_pa[t, (d+1):(d+d)]^(-1), nrow=d,ncol=d)%*%psi_pa[t,1:d]) +
-           rnorm(d, 0, ((psi_pa[t, (d+1):(d+d)])^(-1)+1)^(-1)))  #f_2:T 
-}
+  return(rmvn(1, diag(((psi_pa[t, (d+1):(d+d)])^(-1) + diag(B)^(-1))^(-1), nrow=d,ncol=d)%*%
+                (diag(B)^(-1)*(A%*%x) + diag(psi_pa[t, (d+1):(d+d)]^(-1), nrow=d,ncol=d)%*%psi_pa[t,1:d]),
+              diag(((psi_pa[t, (d+1):(d+d)])^(-1) + diag(B)^(-1))^(-1), d, d)))
 
 #psi.tilda_t = f (xt, ψt+1); psi.tilda_n = 1
 psi_tilda <- function(x, psi_pa, t, n){  #from 0 to T. 0,T = 1 
