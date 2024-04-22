@@ -21,10 +21,11 @@ mu_aux <- function(psi_pa, N, t){
                 (psi_pa[t, (d+1):(d+d)]^(-1)*psi_pa[t,1:d]), 
               diag((psi_pa[t, (d+1):(d+d)]^(-1) + diag(ini_cov)^(-1))^(-1), nrow=d, ncol = d)))
 }
+
 #twisted g
 g_aux <- function(y, x, t, psi_pa, n, L){  
   if(t == (n-L+1)){
-    return(g(y, x) + psi_tilda(x, psi_pa, t, n) - (1/2)*log(2*pi)-(1/2)*log(det(diag(psi_pa[t, (d+1):(d+d)]+1, nrow=d,ncol=d))) - 
+    return(g(y, x) + psi_tilda(x, psi_pa, t, n) - (d/2)*log(2*pi)-(1/2)*log(det(diag(psi_pa[t, (d+1):(d+d)]+1, nrow=d,ncol=d))) - 
              (1/2)*t(-psi_pa[t, 1:d])%*%
              diag((psi_pa[t, (d+1):(d+d)]+1)^(-1), nrow=d,ncol=d)%*%
              (-psi_pa[t, 1:d]) - psi_t(x, psi_pa, t, n))  #initialisation of g = t=1 or t=L?
@@ -40,7 +41,7 @@ g_transition <- function(y, x, t, psi_pa, n){
 
 g_aux_smoo <- function(y, x, t, psi_pa, n){  
   if(t == 1){
-    return(g(y, x) + psi_tilda(x, psi_pa, t, n) -(1/2)*log((2*pi))-(1/2)*log(det(diag(psi_pa[t, (d+1):(d+d)]+1, nrow=d,ncol=d))) - 
+    return(g(y, x) + psi_tilda(x, psi_pa, t, n) -(d/2)*log((2*pi))-(1/2)*log(det(diag(psi_pa[t, (d+1):(d+d)]+1, nrow=d,ncol=d))) - 
              (1/2)*t(-psi_pa[t, 1:d])%*%
              diag((psi_pa[t, (d+1):(d+d)]+1)^(-1), nrow=d,ncol=d)%*%
              (-psi_pa[t, 1:d]) - psi_t(x, psi_pa, t, n))  #initialisation of g = t=1 or t=L?
@@ -51,17 +52,18 @@ g_aux_smoo <- function(y, x, t, psi_pa, n){
 
 #twisted f
 f_aux <- function(x, psi_pa, t){
-  return(rmvn(1, diag(((psi_pa[t, (d+1):(d+d)])^(-1) + diag(B)^(-1))^(-1), nrow=d,ncol=d)%*%
-                (diag(B)^(-1)*(A%*%x) + diag(psi_pa[t, (d+1):(d+d)]^(-1), nrow=d,ncol=d)%*%psi_pa[t,1:d]),
-              diag(((psi_pa[t, (d+1):(d+d)])^(-1) + diag(B)^(-1))^(-1), d, d)))
+  return(diag(((psi_pa[t, (d+1):(d+d)])^(-1)+1)^(-1), nrow=d,ncol=d)%*%
+           (A%*%x + diag(psi_pa[t, (d+1):(d+d)]^(-1), nrow=d,ncol=d)%*%psi_pa[t,1:d]) +
+           rnorm(d, 0, ((psi_pa[t, (d+1):(d+d)])^(-1)+1)^(-1)))  #f_2:T 
+}
 
 #psi.tilda_t = f (xt, ψt+1); psi.tilda_n = 1
 psi_tilda <- function(x, psi_pa, t, n){  #from 0 to T. 0,T = 1 
   if(t == n){
     psi_tilda <- 0
   }else{   #psi_pa_t = psi_t
-    psi_tilda <- (-1/2)*log(2*pi) -(1/2)*log(det(diag(psi_pa[t+1, (d+1):(d+d)]+ diag(B), nrow=d, ncol=d))) +
-      (-1/2)*t(A%*%x - psi_pa[t+1, 1:d])%*%diag((psi_pa[t+1, (d+1):(d+d)] + diag(B))^(-1), nrow=d,ncol=d)%*%
+    psi_tilda <- (-d/2)*log(2*pi) -(1/2)*log(det(diag(psi_pa[t+1, (d+1):(d+d)]+1, nrow=d, ncol=d))) +
+      (-1/2)*t(A%*%x - psi_pa[t+1, 1:d])%*%diag((psi_pa[t+1, (d+1):(d+d)]+1)^(-1), nrow=d,ncol=d)%*%
       (A%*%x-psi_pa[t+1, 1:d]) 
   }
   return(psi_tilda)
@@ -72,7 +74,7 @@ psi_t <- function(x, psi_pa, t, n){
   if(t == (n + 1)){
     psi_t <- 0
   }else{
-    psi_t <- -(1/2)*log(2*pi) -(1/2)*log(det(diag(psi_pa[t, (d+1):(d+d)], nrow=d,ncol=d))) +						
+    psi_t <- -(d/2)*log(2*pi) -(1/2)*log(det(diag(psi_pa[t, (d+1):(d+d)], nrow=d,ncol=d))) +						
       (-1/2)*t(x-psi_pa[t, 1:d])%*%diag((psi_pa[t, (d+1):(d+d)])^(-1), nrow=d,ncol=d)%*%						
       (x-psi_pa[t, 1:d])
   }
