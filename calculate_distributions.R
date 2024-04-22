@@ -16,12 +16,11 @@ g <- function(y, x){
 }
 
 #twisted mu
-mu_aux <- function(psi_pa, l, N, t){  
-  return(rmvn(N, (psi_pa[t, (d+1):(d+d)]^(-1) + 1)^(-1)*
+mu_aux <- function(psi_pa, N, t){  
+  return(rmvn(N, (psi_pa[t, (d+1):(d+d)]^(-1) + diag(ini_cov)^(-1))^(-1)*
                 (psi_pa[t, (d+1):(d+d)]^(-1)*psi_pa[t,1:d]), 
-              diag((psi_pa[t, (d+1):(d+d)]^(-1) + 1)^(-1), nrow=d, ncol = d)))
+              diag((psi_pa[t, (d+1):(d+d)]^(-1) + diag(ini_cov)^(-1))^(-1), nrow=d, ncol = d)))
 }
-
 #twisted g
 g_aux <- function(y, x, t, psi_pa, n, L){  
   if(t == (n-L+1)){
