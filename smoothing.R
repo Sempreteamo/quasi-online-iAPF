@@ -8,7 +8,7 @@ smoothing_APF <- function(psi_pa){
   
   #when n = kL, we use the new mu.tilda to initialize particles
   
-  X_apf[1,,] <- mu_aux(psi_pa, 1, N, 1)
+  X_apf[1,,] <- mu_aux(psi_pa, N, 1)
   for(i in 1:Num){
     w_apf[1,i] <- g_aux_smoo(obs[1], X_apf[1,i,], 1, psi_pa, Time)
   }
