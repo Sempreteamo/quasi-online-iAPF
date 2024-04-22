@@ -10,7 +10,7 @@ psi_APF <- function(n, w, X, psi_pa, N, L){ #purely filtering particles
   # w_apf[1:(n-L+1),i] <- g_aux(obs[n-L+1,], X_apf[n-L+1,i,],n-L+1, psi_pa, n, L) 
   #}
   if(n == L){
-    X_apf[n-L+1,,] <- mu_aux(psi_pa, l, N, n-L+1)
+    X_apf[n-L+1,,] <- mu_aux(psi_pa, N, n-L+1)
     for (i in 1:(n-L)) {
       X_apf[i,,] <- X_apf[n-L+1,,]
     }
